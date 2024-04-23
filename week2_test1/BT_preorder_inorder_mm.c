@@ -62,7 +62,7 @@ static int find(int num, int size, const struct hlist_head *heads)
 {
     struct hlist_node *p;
     int bits =ceil(log2(size));
-    int hash = (num < 0 ? hash_32(-num, 64) : hash_32(num, 64));
+    int hash = (num < 0 ? hash_32(-num, bits) : hash_32(num, bits));
     hlist_for_each (p, &heads[hash]) {
         struct order_node *on = list_entry(p, struct order_node, node);
         if (num == on->val)
@@ -102,7 +102,7 @@ static inline void node_add(int val,
     on->val = val;
     on->idx = idx;
     int bits =ceil(log2(size));
-    int hash = (val < 0 ? hash_32(-val, 64) : hash_32(val, 64));
+    int hash = (val < 0 ? hash_32(-val, bits) : hash_32(val, bits));
     hlist_add_head(&on->node, &heads[hash]);
 }
 
@@ -111,8 +111,10 @@ static struct TreeNode *buildTree(int *preorder,
                                   int *inorder,
                                   int inorderSize)
 {
-    struct hlist_head *in_heads = malloc(inorderSize * sizeof(*in_heads));
-    for (int i = 0; i < inorderSize; i++)
+    
+    int bucketcount = 1 << (int)(ceil(log2(inorderSize)));
+    struct hlist_head *in_heads = malloc(bucketcount * sizeof(*in_heads));
+    for (int i = 0; i < bucketcount; i++)
         INIT_HLIST_HEAD(&in_heads[i]);
     for (int i = 0; i < inorderSize; i++)
         node_add(inorder[i], i, inorderSize, in_heads);
