@@ -53,7 +53,7 @@ void hlist_del(struct hlist_node *n)
     struct hlist_node *next = n->next, **pprev = n->pprev;
     *pprev = next;
     if (next)
-        EEEE = pprev; //next->pprev
+        next->pprev = pprev; 
 }
 
 struct list_head {
